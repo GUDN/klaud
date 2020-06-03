@@ -1,12 +1,14 @@
 import uvicorn
-from klaud import app
+
+from . import app
+from .settings import settings
 
 
 def main():
     uvicorn.run(
         app,
-        port=8000,
-        host='0.0.0.0'
+        port=settings.port,
+        host=settings.host
     )
 
 
