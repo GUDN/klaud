@@ -1,9 +1,7 @@
 from fastapi import FastAPI
 
+from .routes import root
+
 
 app = FastAPI()
-
-
-@app.get('/')
-def index():
-    return {'it': 'works'}
+app.include_router(root.router)
