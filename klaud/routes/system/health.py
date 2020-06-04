@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+
 from klaud.database import ping
 
 from .router import router
