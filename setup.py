@@ -24,7 +24,7 @@ setup(
     python_requires='>=3.8',
     packages=find_packages(exclude=['tests']),
     install_requires=load_requirements('requirements.txt'),
-    extra_require={'dev': load_requirements('requirements.dev.txt')},
+    extras_require={'dev': load_requirements('requirements.dev.txt')},
     entry_points={
         'console_scripts': [
             'klaud-server = klaud.__main__:main'

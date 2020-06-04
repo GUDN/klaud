@@ -15,4 +15,4 @@ p.add('--db-user', type=str, default='user', help='mongo server user')
 p.add('--db-password', type=str, default='hackme', help='mongo server password')
 p.add('--db-name', type=str, default='klaud', help='mongo database name')
 
-settings = p.parse_args()
+settings = p.parse_known_args()[0]
