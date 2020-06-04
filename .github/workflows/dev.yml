@@ -1,0 +1,33 @@
+name: dev
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mongo:
+        image: docker://mongo
+        ports:
+          - 27017:27017
+        env:
+          MONGO_INITDB_ROOT_USERNAME: user
+          MONGO_INITDB_ROOT_PASSWORD: hackme
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Install klaud
+        run: |
+          python3.8 -m pip install -e .[dev]
+      - name: Lint
+        run: |
+          flake8 . --statistics --count
+      - name: Test
+        env:
+          KLAUD_DB_HOST: localhost
+        run: |
+          while ! nc -z localhost 27017; do sleep 0.1; done
+          pytest
