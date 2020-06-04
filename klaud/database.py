@@ -1,3 +1,5 @@
+from typing import Optional
+
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 from pymongo.errors import ServerSelectionTimeoutError
 
@@ -13,7 +15,9 @@ uri = 'mongodb://{}:{}@{}:{}'.format(
 _client = AsyncIOMotorClient(uri)
 
 
-def db(name=settings.db_name) -> AsyncIOMotorDatabase:
+def db(name: Optional[str] = None) -> AsyncIOMotorDatabase:
+    if not name:
+        return _client[settings.db_name]
     return _client[name]
 
 
