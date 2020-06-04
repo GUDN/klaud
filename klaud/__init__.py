@@ -2,7 +2,13 @@ from fastapi import FastAPI
 
 from .routes import root, system
 
-app = FastAPI()
+app = FastAPI(
+    title='KLAUD',
+    version='0.1.0',
+    description='Base cloud storage',
+    docs_url='/_docs',
+    redoc_url=None
+)
 
 app.include_router(root.router)
 app.include_router(
