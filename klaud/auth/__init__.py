@@ -4,11 +4,12 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
-from pydantic import BaseModel, Field
 
-from .models.user import User, UserInDB
-from .settings import settings
-from .utils import passwords
+from klaud.models.user import User, UserInDB
+from klaud.settings import settings
+from klaud.utils import passwords
+
+from .models import AuthObject, Token
 
 ALGORITHM = 'HS256'
 
@@ -19,15 +20,6 @@ credentials_exception = HTTPException(
     detail='Invalid credentials',
     headers={'WWW-Authenticate': 'Bearer'},
 )
-
-
-class Token(BaseModel):
-    access_token: str = Field(..., example='simple_access_token')
-    token_type: str = Field(..., example='Bearer')
-
-
-class AuthObject(BaseModel):
-    user: UserInDB
 
 
 def generate_token(payload: dict) -> str:
