@@ -1,3 +1,5 @@
+import secrets
+
 from configargparse import ArgParser
 
 p = ArgParser(
@@ -14,5 +16,8 @@ p.add('--db-port', type=int, default=27017, help='mongo server port')
 p.add('--db-user', type=str, default='user', help='mongo server user')
 p.add('--db-password', type=str, default='hackme', help='mongo server password')
 p.add('--db-name', type=str, default='klaud', help='mongo database name')
+
+p.add('-S', '--secret', type=str, default=secrets.token_hex(64), help='secret token')
+p.add('--access-token-life', type=int, default=15, help='access token life duration (in minutes)')
 
 settings = p.parse_known_args()[0]

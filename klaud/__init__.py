@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from . import auth
 from .routes import root, system
 
 app = FastAPI(
@@ -11,6 +12,10 @@ app = FastAPI(
 )
 
 app.include_router(root.router)
+app.include_router(
+    auth.router,
+    tags=['authentication']
+)
 app.include_router(
     system.router,
     prefix='/_sys',
