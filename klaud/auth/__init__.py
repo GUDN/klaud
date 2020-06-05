@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Callable
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -10,16 +11,32 @@ from klaud.settings import settings
 from klaud.utils import passwords
 
 from .models import AuthObject, Token
+from .scopes import Scopes
 
 ALGORITHM = 'HS256'
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/_token")
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="/_token",
+    scopes={
+        'master': 'master priviliges on token (avaliable only for master account)'
+    }
+)
 router = APIRouter()
 credentials_exception = HTTPException(
     status_code=status.HTTP_401_UNAUTHORIZED,
     detail='Invalid credentials',
     headers={'WWW-Authenticate': 'Bearer'},
 )
+
+
+async def init():
+    master = UserInDB(
+        uid='',
+        username=settings.master_name,
+        hashed=passwords.hashpw(settings.master_password),
+        is_master=True
+    )
+    await master.insert()
 
 
 def generate_token(payload: dict) -> str:
@@ -49,13 +66,25 @@ async def login(credentials: OAuth2PasswordRequestForm = Depends()):
         raise credentials_exception
     if not passwords.checkpw(credentials.password, user.hashed):
         raise credentials_exception
+    scopes = credentials.scopes
+    scope = Scopes.NONE
+    if scopes:
+        if 'master' in scopes and not user.is_master:
+            raise credentials_exception
+        for scope_ in scopes:
+            scope_ = Scopes.__members__.get(scope_.upper())
+            if scope_:
+                scope |= scope_
     return Token(
-        access_token=generate_token({'username': user.username}),
+        access_token=generate_token({
+            'username': user.username,
+            'scope': scope.value
+        }),
         token_type='bearer'
     )
 
 
-async def auth(token: str = Depends(oauth2_scheme)) -> UserInDB:
+async def auth(token: str = Depends(oauth2_scheme)) -> AuthObject:
     try:
         payload = jwt.decode(token, settings.secret, algorithms=[ALGORITHM])
     except PyJWTError:
@@ -66,7 +95,23 @@ async def auth(token: str = Depends(oauth2_scheme)) -> UserInDB:
     user = await UserInDB.find_by_username(username)
     if not user:
         raise credentials_exception
-    return AuthObject(user=user)
+    return AuthObject(
+        user=user,
+        scope=Scopes(payload.get('scope', 0))
+    )
+
+
+def auths(scope: Scopes = Scopes.NONE) -> Callable[[AuthObject], AuthObject]:
+    def _auths(obj: AuthObject = Depends(auth)) -> AuthObject:
+        if scope is Scopes.NONE:
+            return obj
+        elif (scope & obj.scope).value:
+            return obj
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail='Token scope error',
+        )
+    return _auths
 
 
 @router.get(

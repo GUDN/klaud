@@ -8,7 +8,10 @@ def create_john_doe(await_, database):
     await_(
         database.users.find_one_and_update(
             {'username': 'john_doe'},
-            {'$set': {'hashed': passwords.hashpw('password')}},
+            {'$set': {
+                'hashed': passwords.hashpw('password'),
+                'is_master': False
+            }},
             upsert=True
         )
     )

@@ -19,5 +19,7 @@ p.add('--db-name', type=str, default='klaud', help='mongo database name')
 
 p.add('-S', '--secret', type=str, default=secrets.token_hex(64), help='secret token')
 p.add('--access-token-life', type=int, default=15, help='access token life duration (in minutes)')
+p.add('--master-name', type=str, default='master', help='master username')
+p.add('--master-password', type=str, default='master', help='master password')
 
 settings = p.parse_known_args()[0]

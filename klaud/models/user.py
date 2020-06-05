@@ -7,6 +7,7 @@ from klaud.database import db
 
 class User(BaseModel):
     username: str = Field(..., example='jonh_doe')
+    is_master: bool = Field(False, example=False)
 
 
 class UserInDB(User):
@@ -21,5 +22,17 @@ class UserInDB(User):
         return cls(
             uid=str(result['_id']),
             username=username,
-            hashed=result['hashed']
+            hashed=result['hashed'],
+            is_master=result['is_master']
+        )
+
+    async def insert(self):
+        await db()['users'].find_one_and_replace(
+            {'username': self.username},
+            {
+                'username': self.username,
+                'hashed': self.hashed,
+                'is_master': self.is_master
+            },
+            upsert=True
         )

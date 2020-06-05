@@ -2,6 +2,8 @@ from pydantic import BaseModel, Field
 
 from klaud.models.user import UserInDB
 
+from .scopes import Scopes
+
 
 class Token(BaseModel):
     access_token: str = Field(..., example='simple_access_token')
@@ -10,3 +12,4 @@ class Token(BaseModel):
 
 class AuthObject(BaseModel):
     user: UserInDB
+    scope: Scopes

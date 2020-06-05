@@ -15,15 +15,16 @@ def await_():
 @pytest.fixture(scope='function')
 def database(await_):
     from klaud.settings import settings
-    from klaud.database import _client, db
+    from klaud.database import client, db, init
+    init()
     database_name = 'test_' + str(uuid.uuid4()).replace('-', '_')
     settings.db_name = database_name
     yield db(database_name)
-    await_(_client.drop_database(database_name))
+    await_(client().drop_database(database_name))
 
 
-@pytest.fixture(scope='session')
-def client():
+@pytest.fixture(scope='function')
+def client(database):
     from klaud import app
     with TestClient(app) as client:
         yield client
