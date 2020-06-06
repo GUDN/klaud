@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 
 from . import auth, database
 from .routes import master, root, system
@@ -28,5 +28,6 @@ app.include_router(
 app.include_router(
     master.router,
     prefix='/_master',
-    tags=['master']
+    tags=['master'],
+    dependencies=[Depends(auth.auths(auth.Scopes.MASTER))]
 )

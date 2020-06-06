@@ -1,9 +1,8 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import HTTPException, status
 from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, Field, validator
 from pymongo.errors import DuplicateKeyError
 
-from klaud.auth import AuthObject, Scopes, auths
 from klaud.models.user import UserInDB
 from klaud.utils import passwords
 
@@ -39,7 +38,7 @@ class RegisterForm(BaseModel):
         }
     }
 )
-async def register(form: RegisterForm, curr: AuthObject = Depends(auths(Scopes.MASTER))):
+async def register(form: RegisterForm):
     user = UserInDB(
         **form.dict(),
         hashed=passwords.hashpw(form.password),

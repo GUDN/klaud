@@ -1,7 +1,4 @@
-from fastapi import Depends
 from fastapi.responses import PlainTextResponse
-
-from klaud.auth import AuthObject, Scopes, auths
 
 from . import register  # noqa: F401
 from .router import router
@@ -12,5 +9,5 @@ from .router import router
     summary='Check master permissions',
     response_class=PlainTextResponse
 )
-def check_master(curr: AuthObject = Depends(auths(Scopes.MASTER))):
+def check_master():
     return 'you are master'
