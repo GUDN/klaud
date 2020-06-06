@@ -1,7 +1,7 @@
 from typing import Optional
 
 from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-from pymongo.errors import ServerSelectionTimeoutError
+from pymongo.errors import OperationFailure, ServerSelectionTimeoutError
 
 from .settings import settings
 
@@ -25,9 +25,19 @@ def client() -> AsyncIOMotorClient:
     return _client
 
 
-def init():
+async def init():
     global _client
     _client = AsyncIOMotorClient(uri)
+    await setup_indexes()
+
+
+async def setup_indexes():
+    async def _create_index(collection: str, *args, **kwargs):
+        try:
+            await db()[collection].create_index(*args, **kwargs)
+        except OperationFailure:
+            pass
+    await _create_index('users', 'username', unique=True)
 
 
 async def ping() -> bool:

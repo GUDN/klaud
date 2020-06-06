@@ -3,6 +3,7 @@ from fastapi.responses import PlainTextResponse
 
 from klaud.auth import AuthObject, Scopes, auths
 
+from . import register  # noqa: F401
 from .router import router
 
 

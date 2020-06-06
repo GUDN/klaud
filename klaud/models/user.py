@@ -36,3 +36,10 @@ class UserInDB(User):
             },
             upsert=True
         )
+
+    async def insert_new(self):
+        await db()['users'].insert_one({
+            'username': self.username,
+            'hashed': self.hashed,
+            'is_master': self.is_master
+        })

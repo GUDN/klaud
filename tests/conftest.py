@@ -16,9 +16,9 @@ def await_():
 def database(await_):
     from klaud.settings import settings
     from klaud.database import client, db, init
-    init()
     database_name = 'test_' + str(uuid.uuid4()).replace('-', '_')
     settings.db_name = database_name
+    await_(init())
     yield db(database_name)
     await_(client().drop_database(database_name))
 
