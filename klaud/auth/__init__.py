@@ -6,12 +6,13 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import PlainTextResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
+from pymongo.errors import DuplicateKeyError
 
 from klaud.models.user import User, UserInDB
 from klaud.settings import settings
 from klaud.utils import passwords
 
-from .models import AuthObject, Token
+from .models import AuthObject, Token, UpdateForm
 from .scopes import Scopes
 
 ALGORITHM = 'HS256'
@@ -133,3 +134,24 @@ def get_me(curr: AuthObject = Depends(auth)):
 async def delete_me(curr: AuthObject = Depends(auths(Scopes.MANAGE))):
     await curr.user.delete()
     return 'OK'
+
+
+@router.patch(
+    '/_me',
+    summary='Update account (requires manage scope)',
+    response_class=PlainTextResponse
+)
+async def patch_me(form: UpdateForm, curr: AuthObject = Depends(auths(Scopes.MANAGE))):
+    user = curr.user
+    if form.username:
+        user.username = form.username
+    if form.password:
+        user.hashed = passwords.hashpw(form.password)
+    try:
+        await user.insert()
+        return 'OK'
+    except DuplicateKeyError:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail='Username is not free'
+        )

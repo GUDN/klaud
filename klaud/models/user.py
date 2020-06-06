@@ -28,14 +28,26 @@ class UserInDB(User):
         )
 
     async def insert(self):
+        if not self.uid:
+            await db()['users'].find_one_and_replace(
+                {'username': self.username},
+                {
+                    'username': self.username,
+                    'hashed': self.hashed,
+                    'is_master': self.is_master
+                },
+                upsert=True
+            )
+            return
+        uid = ObjectId(self.uid)
         await db()['users'].find_one_and_replace(
-            {'username': self.username},
+            {'_id': uid},
             {
+                '_id': uid,
                 'username': self.username,
                 'hashed': self.hashed,
                 'is_master': self.is_master
-            },
-            upsert=True
+            }
         )
 
     async def insert_new(self):
