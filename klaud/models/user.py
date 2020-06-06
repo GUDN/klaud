@@ -1,5 +1,6 @@
 from typing import Optional
 
+from bson.objectid import ObjectId
 from pydantic import BaseModel, Field
 
 from klaud.database import db
@@ -42,4 +43,9 @@ class UserInDB(User):
             'username': self.username,
             'hashed': self.hashed,
             'is_master': self.is_master
+        })
+
+    async def delete(self):
+        await db()['users'].delete_one({
+            '_id': ObjectId(self.uid)
         })

@@ -3,6 +3,7 @@ from typing import Callable
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import PlainTextResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt import PyJWTError
 
@@ -18,7 +19,8 @@ ALGORITHM = 'HS256'
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/_token",
     scopes={
-        'master': 'master priviliges on token (avaliable only for master account)'
+        'master': 'master priviliges on token (avaliable only for master account)',
+        'manage': 'manage current account'
     }
 )
 router = APIRouter()
@@ -119,5 +121,15 @@ def auths(scope: Scopes = Scopes.NONE) -> Callable[[AuthObject], AuthObject]:
     summary='Get info about current user',
     response_model=User
 )
-def me(curr: AuthObject = Depends(auth)):
+def get_me(curr: AuthObject = Depends(auth)):
     return User(**curr.user.dict())
+
+
+@router.delete(
+    '/_me',
+    summary='Delete current account permanently (requires manage scope)',
+    response_class=PlainTextResponse
+)
+async def delete_me(curr: AuthObject = Depends(auths(Scopes.MANAGE))):
+    await curr.user.delete()
+    return 'OK'
