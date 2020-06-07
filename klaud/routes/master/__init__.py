@@ -1,6 +1,6 @@
 from fastapi.responses import PlainTextResponse
 
-from . import register  # noqa: F401
+from . import register, status  # noqa: F401
 from .router import router
 
 
