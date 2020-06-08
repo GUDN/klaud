@@ -21,7 +21,9 @@ oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="/_token",
     scopes={
         'master': 'master priviliges on token (avaliable only for master account)',
-        'manage': 'manage current account'
+        'manage': 'manage current account',
+        'read': 'read data',
+        'write': 'write data'
     }
 )
 router = APIRouter()

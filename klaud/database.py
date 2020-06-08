@@ -1,6 +1,7 @@
 from typing import Optional
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
+from motor.motor_asyncio import (AsyncIOMotorClient, AsyncIOMotorDatabase,
+                                 AsyncIOMotorGridFSBucket)
 from pymongo.errors import OperationFailure, ServerSelectionTimeoutError
 
 from .settings import settings
@@ -13,6 +14,7 @@ uri = 'mongodb://{}:{}@{}:{}'.format(
 )
 
 _client = None
+_gfs = None
 
 
 def db(name: Optional[str] = None) -> AsyncIOMotorDatabase:
@@ -25,10 +27,15 @@ def client() -> AsyncIOMotorClient:
     return _client
 
 
+def gfs() -> AsyncIOMotorGridFSBucket:
+    return _gfs
+
+
 async def init():
-    global _client
+    global _client, _gfs
     _client = AsyncIOMotorClient(uri)
     await setup_indexes()
+    _gfs = AsyncIOMotorGridFSBucket(db())
 
 
 async def setup_indexes():

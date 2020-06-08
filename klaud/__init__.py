@@ -1,7 +1,7 @@
 from fastapi import Depends, FastAPI
 
 from . import auth, database
-from .routes import master, root, system
+from .routes import fs, master, root, system
 
 app = FastAPI(
     title='KLAUD',
@@ -30,4 +30,8 @@ app.include_router(
     prefix='/_master',
     tags=['master'],
     dependencies=[Depends(auth.auths(auth.Scopes.MASTER))]
+)
+app.include_router(
+    fs.router,
+    tags=['fs']
 )

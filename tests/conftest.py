@@ -43,3 +43,20 @@ def create_john_doe(await_, database):
             upsert=True
         )
     )
+
+
+@pytest.fixture(scope='function')
+def john_doe_headers(client, create_john_doe):
+    resp = client.post(
+        '/_token',
+        data={
+            'grant_type': 'password',
+            'scope': 'read write',
+            'username': 'john_doe',
+            'password': 'password'
+        }
+    )
+    token = resp.json()['access_token']
+    return {
+        'Authorization': f'Bearer {token}'
+    }
