@@ -28,3 +28,18 @@ def client(database):
     from klaud import app
     with TestClient(app) as client:
         yield client
+
+
+@pytest.fixture(scope='function', autouse=True)
+def create_john_doe(await_, database):
+    from klaud.utils import passwords
+    await_(
+        database.users.find_one_and_update(
+            {'username': 'john_doe'},
+            {'$set': {
+                'hashed': passwords.hashpw('password'),
+                'is_master': False
+            }},
+            upsert=True
+        )
+    )

@@ -1,7 +1,6 @@
 import pytest
 
 from klaud.settings import settings
-from klaud.utils import passwords
 
 
 @pytest.fixture(scope='function')
@@ -19,18 +18,6 @@ def master_headers(client):
     return {
         'Authorization': f'Bearer {token}'
     }
-
-
-@pytest.fixture(scope='function', autouse=True)
-def create_john_doe(await_, database):
-    await_(database.users.find_one_and_update(
-        {'username': 'john_doe'},
-        {'$set': {
-            'hashed': passwords.hashpw('password'),
-            'is_master': False
-        }},
-        upsert=True
-    ))
 
 
 @pytest.fixture(scope='function')
