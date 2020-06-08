@@ -28,7 +28,7 @@ async def put(
     except ValueError:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail='different content types'
+            detail='Different content types'
         )
     filename = f'@{curr.user.username}{path}'
     gfs_ = gfs()

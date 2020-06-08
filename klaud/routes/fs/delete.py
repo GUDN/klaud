@@ -28,6 +28,6 @@ async def delete(path: Path = '', curr: AuthObject = Depends(auths(Scopes.WRITE)
     if not deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='current path is not exists'
+            detail='Current path is not exists'
         )
     return 'OK'

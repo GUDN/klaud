@@ -26,7 +26,7 @@ async def get(path: Path = '', curr: AuthObject = Depends(auths(Scopes.READ))):
     except NoFile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail='current path is not exists'
+            detail='Current path is not exists'
         )
 
     async def _handler():
